@@ -7,6 +7,8 @@ import { Button, Card, SectionTitle, Spinner } from "@/components/ui/primitives"
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ScoreGauge } from "@/components/report/ScoreGauge";
 import { RiskMatrix } from "@/components/report/RiskMatrix";
+import { TeamBox } from "@/components/report/TeamBox";
+import Link from "next/link";
 
 const SEVERITY_WORD = ["", "Very low", "Low", "Medium", "High", "Critical"];
 
@@ -14,6 +16,7 @@ export default function ReportPage() {
   const router = useRouter();
   const hydrated = useHydrated();
   const prd = useProject((s) => s.prd);
+  const tasks = useProject((s) => s.tasks);
   const report = useProject((s) => s.report);
   const reset = useProject((s) => s.reset);
 
@@ -43,10 +46,18 @@ export default function ReportPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-5 py-10">
-      <SectionTitle
-        eyebrow="Step 6 · Feasibility report"
-        title={`Delivery assessment — ${prd.title}`}
-      />
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <SectionTitle
+          eyebrow="Step 6 · Feasibility report"
+          title={`Delivery assessment — ${prd.title}`}
+        />
+        <Link
+          href="/export"
+          className="mt-1 inline-flex items-center gap-2 rounded-full bg-careem px-4 py-2 text-sm font-bold text-midnight shadow-sm transition-transform hover:scale-[1.02]"
+        >
+          <span aria-hidden>⬇</span> Download full PDF
+        </Link>
+      </div>
 
       <div className="grid lg:grid-cols-[minmax(0,1fr)_300px] gap-6 items-stretch">
         <Card className="p-7">
@@ -152,6 +163,16 @@ export default function ReportPage() {
           </Card>
         </div>
       </div>
+
+      <Card className="p-7 mt-6">
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="font-extrabold text-midnight">Project team</h3>
+          <span className="text-xs font-semibold text-muted font-[family-name:var(--font-ui)]">
+            Assigned from the staffed Gantt
+          </span>
+        </div>
+        <TeamBox tasks={tasks} />
+      </Card>
 
       <Card className="p-7 mt-6">
         <h3 className="font-extrabold text-midnight mb-3">Recommendations</h3>

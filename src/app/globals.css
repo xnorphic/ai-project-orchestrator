@@ -154,3 +154,39 @@ h4 {
   background-size: 480px 100%;
   animation: shimmer 1.4s infinite linear;
 }
+
+/* ----------------------------- Print / PDF ----------------------------- */
+/* The /export route renders every step as one A4 document. These rules make
+   "Save as PDF" (or print) produce clean, paginated output. */
+@media print {
+  @page {
+    size: A4;
+    margin: 14mm;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+  }
+
+  /* Hide app chrome and anything explicitly marked no-print. */
+  .no-print {
+    display: none !important;
+  }
+
+  /* Force backgrounds/colors to render in print. */
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .print-page {
+    break-after: page;
+  }
+  .print-page:last-child {
+    break-after: auto;
+  }
+  .avoid-break {
+    break-inside: avoid;
+  }
+}
