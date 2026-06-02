@@ -66,7 +66,7 @@ export default function PRDPage() {
         desc="The PRD on the left was expanded from your idea. Your answers on the right shape the timeline, staffing, and risk."
       />
 
-      <div className="grid lg:grid-cols-[1.4fr_1fr] gap-6 items-start">
+      <div className="grid lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] gap-6 items-start">
         <Card className="p-7">
           <PRDViewer prd={prd} />
         </Card>

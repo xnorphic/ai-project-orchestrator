@@ -48,7 +48,7 @@ export default function ReportPage() {
         title={`Delivery assessment — ${prd.title}`}
       />
 
-      <div className="grid lg:grid-cols-[1fr_auto] gap-6 items-stretch">
+      <div className="grid lg:grid-cols-[minmax(0,1fr)_300px] gap-6 items-stretch">
         <Card className="p-7">
           <div className="text-xs font-bold uppercase tracking-wide text-careem-deep mb-2">
             Executive summary
@@ -75,15 +75,15 @@ export default function ReportPage() {
           </div>
         </Card>
 
-        <Card className="p-7 flex flex-col items-center justify-center min-w-64">
+        <Card className="p-7 flex flex-col items-center justify-center text-center">
           <ScoreGauge score={report.feasibilityScore} />
-          <div className="mt-3 text-center">
-            <div className="font-extrabold text-midnight">{report.verdict}</div>
+          <div className="mt-3 font-extrabold text-midnight text-balance">
+            {report.verdict}
           </div>
         </Card>
       </div>
 
-      <div className="grid lg:grid-cols-[1.2fr_1fr] gap-6 mt-6 items-start">
+      <div className="grid lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] gap-6 mt-6 items-start">
         {/* Risks */}
         <Card className="p-7">
           <h3 className="font-extrabold text-midnight mb-4">Delivery risks</h3>
