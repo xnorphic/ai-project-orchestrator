@@ -13,9 +13,10 @@ question must include 2-4 options and a single recommended answer, and target
 decisions that materially change timeline, staffing, or risk.`;
 
 export async function POST(req: Request) {
-  const { idea, keys } = (await req.json()) as {
+  const { idea, keys, forceFallback } = (await req.json()) as {
     idea?: string;
     keys?: ProvidedKeys;
+    forceFallback?: boolean;
   };
   const cleanIdea = (idea ?? "").trim();
 
@@ -23,7 +24,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "idea is required" }, { status: 400 });
   }
 
-  if (hasAnthropic(keys)) {
+  if (!forceFallback && hasAnthropic(keys)) {
     const ai = await generateStructured({
       model: claudeDeep(keys),
       schema: prdSchema,

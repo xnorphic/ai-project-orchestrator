@@ -16,13 +16,15 @@ delivery weeks and cost on the provided baseline. Make the pessimistic case
 genuinely cautionary and the optimistic case credible, not fantasy.`;
 
 export async function POST(req: Request) {
-  const { prd, tasks, option, assignments, keys } = (await req.json()) as {
-    prd?: PRD;
-    tasks?: Task[];
-    option?: TimelineOption;
-    assignments?: Record<string, string>;
-    keys?: ProvidedKeys;
-  };
+  const { prd, tasks, option, assignments, keys, forceFallback } =
+    (await req.json()) as {
+      prd?: PRD;
+      tasks?: Task[];
+      option?: TimelineOption;
+      assignments?: Record<string, string>;
+      keys?: ProvidedKeys;
+      forceFallback?: boolean;
+    };
 
   if (!prd || !tasks || !option) {
     return NextResponse.json(
@@ -33,7 +35,7 @@ export async function POST(req: Request) {
   const assigns = assignments ?? {};
   const baseline = computeBaseline(tasks, assigns);
 
-  if (hasAnthropic(keys)) {
+  if (!forceFallback && hasAnthropic(keys)) {
     const ai = await generateStructured({
       model: claudeDeep(keys),
       schema: scenariosSchema,

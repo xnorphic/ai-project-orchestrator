@@ -25,9 +25,10 @@ const assignmentSchema = z.object({
 });
 
 export async function POST(req: Request) {
-  const { tasks, keys } = (await req.json()) as {
+  const { tasks, keys, forceFallback } = (await req.json()) as {
     tasks?: Task[];
     keys?: ProvidedKeys;
+    forceFallback?: boolean;
   };
 
   if (!tasks || tasks.length === 0) {
@@ -37,7 +38,7 @@ export async function POST(req: Request) {
   // Deterministic baseline — always available.
   const baseline = assignPersonnel(tasks);
 
-  if (hasOpenAI(keys)) {
+  if (!forceFallback && hasOpenAI(keys)) {
     const roster = personnel.map((p) => ({
       id: p.id,
       name: p.name,

@@ -14,8 +14,12 @@ import type { LanguageModel } from "ai";
  * OpenAI:  a mini model for the fast, structured personnel matching.
  */
 
+// Defaults favour Haiku so live calls finish inside Vercel's serverless
+// function timeout (Sonnet on a large schema can run 60-90s and 504s on the
+// Hobby plan). Set APO_CLAUDE_DEEP_MODEL=claude-sonnet-4-5 locally or on a plan
+// with a higher function limit if you want Sonnet's depth.
 export const CLAUDE_DEEP_MODEL =
-  process.env.APO_CLAUDE_DEEP_MODEL ?? "claude-sonnet-4-5";
+  process.env.APO_CLAUDE_DEEP_MODEL ?? "claude-haiku-4-5";
 export const CLAUDE_FAST_MODEL =
   process.env.APO_CLAUDE_FAST_MODEL ?? "claude-haiku-4-5";
 export const OPENAI_MODEL = process.env.APO_OPENAI_MODEL ?? "gpt-4o-mini";

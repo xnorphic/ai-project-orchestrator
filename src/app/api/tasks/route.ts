@@ -15,7 +15,8 @@ and the human role/seniority that owns it. Mark every CRITICAL juncture as a
 human-in-the-loop gate (isHITL true) with a short hitlReason and assign it the
 correct senior role. Schedule with startWeek (0-indexed) and durationWeeks,
 using dependsOn (task ids) to express ordering. Keep total span close to the
-timeline's total weeks; allow parallel work via overlapping weeks.`;
+timeline's total weeks; allow parallel work via overlapping weeks.
+Produce a focused plan of 12-20 tasks (not more) so it stays readable.`;
 
 function normalize(tasks: Task[]): Task[] {
   return tasks
@@ -32,10 +33,11 @@ function normalize(tasks: Task[]): Task[] {
 }
 
 export async function POST(req: Request) {
-  const { prd, option, keys } = (await req.json()) as {
+  const { prd, option, keys, forceFallback } = (await req.json()) as {
     prd?: PRD;
     option?: TimelineOption;
     keys?: ProvidedKeys;
+    forceFallback?: boolean;
   };
 
   if (!prd || !option) {
@@ -45,7 +47,7 @@ export async function POST(req: Request) {
     );
   }
 
-  if (hasAnthropic(keys)) {
+  if (!forceFallback && hasAnthropic(keys)) {
     const ai = await generateStructured({
       model: claudeDeep(keys),
       schema: tasksSchema,

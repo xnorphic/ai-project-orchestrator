@@ -20,7 +20,7 @@ Each risk has a severity (1-5) and likelihood (1-5). Be direct and specific
 with numbers. Recommendations should be actionable.`;
 
 export async function POST(req: Request) {
-  const { prd, tasks, option, assignments, scenarios, keys } =
+  const { prd, tasks, option, assignments, scenarios, keys, forceFallback } =
     (await req.json()) as {
       prd?: PRD;
       tasks?: Task[];
@@ -28,6 +28,7 @@ export async function POST(req: Request) {
       assignments?: Record<string, string>;
       scenarios?: Scenario[];
       keys?: ProvidedKeys;
+      forceFallback?: boolean;
     };
 
   if (!prd || !tasks || !option) {
@@ -49,7 +50,7 @@ export async function POST(req: Request) {
     scenarios ?? [],
   );
 
-  if (hasAnthropic(keys)) {
+  if (!forceFallback && hasAnthropic(keys)) {
     const ai = await generateStructured({
       model: claudeDeep(keys),
       schema: reportSchema,

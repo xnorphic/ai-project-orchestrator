@@ -16,18 +16,19 @@ Be concrete about what is added or skipped and why. recommended must be true
 only for the recommended option.`;
 
 export async function POST(req: Request) {
-  const { prd, answers, keys } = (await req.json()) as {
+  const { prd, answers, keys, forceFallback } = (await req.json()) as {
     prd?: PRD;
     answers?: Record<string, string>;
     questions?: ClarifyingQuestion[];
     keys?: ProvidedKeys;
+    forceFallback?: boolean;
   };
 
   if (!prd) {
     return NextResponse.json({ error: "prd is required" }, { status: 400 });
   }
 
-  if (hasAnthropic(keys)) {
+  if (!forceFallback && hasAnthropic(keys)) {
     const ai = await generateStructured({
       model: claudeFast(keys),
       schema: timelineSchema,

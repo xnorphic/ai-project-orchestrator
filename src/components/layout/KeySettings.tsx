@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useKeys } from "@/lib/store/keys-store";
+import { useUi } from "@/lib/store/ui-store";
 import { useHydrated } from "@/lib/use-hydrated";
 import { Button } from "@/components/ui/primitives";
 import { clsx } from "@/lib/clsx";
@@ -19,7 +20,9 @@ export function KeySettings() {
   const setOpenai = useKeys((s) => s.setOpenai);
   const clear = useKeys((s) => s.clear);
 
-  const [open, setOpen] = useState(false);
+  const open = useUi((s) => s.keysOpen);
+  const setOpen = (v: boolean) =>
+    v ? useUi.getState().openKeys() : useUi.getState().closeKeys();
   const [a, setA] = useState("");
   const [o, setO] = useState("");
   const [saved, setSaved] = useState(false);
