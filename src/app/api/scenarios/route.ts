@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { claudeDeep, hasAnthropicKey } from "@/lib/ai/models";
+import { claudeDeep, hasAnthropic, type ProvidedKeys } from "@/lib/ai/models";
 import { generateStructured } from "@/lib/ai/generate";
 import { scenariosSchema } from "@/lib/ai/schemas";
 import { buildScenarios, computeBaseline } from "@/lib/logic/scenarios";
@@ -16,11 +16,12 @@ delivery weeks and cost on the provided baseline. Make the pessimistic case
 genuinely cautionary and the optimistic case credible, not fantasy.`;
 
 export async function POST(req: Request) {
-  const { prd, tasks, option, assignments } = (await req.json()) as {
+  const { prd, tasks, option, assignments, keys } = (await req.json()) as {
     prd?: PRD;
     tasks?: Task[];
     option?: TimelineOption;
     assignments?: Record<string, string>;
+    keys?: ProvidedKeys;
   };
 
   if (!prd || !tasks || !option) {
@@ -32,9 +33,9 @@ export async function POST(req: Request) {
   const assigns = assignments ?? {};
   const baseline = computeBaseline(tasks, assigns);
 
-  if (hasAnthropicKey()) {
+  if (hasAnthropic(keys)) {
     const ai = await generateStructured({
-      model: claudeDeep(),
+      model: claudeDeep(keys),
       schema: scenariosSchema,
       system: SYSTEM,
       prompt:

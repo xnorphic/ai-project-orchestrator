@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { gpt, hasOpenAIKey } from "@/lib/ai/models";
+import { gpt, hasOpenAI, type ProvidedKeys } from "@/lib/ai/models";
 import { generateStructured } from "@/lib/ai/generate";
 import { assignPersonnel, computeGaps } from "@/lib/logic/matching";
 import { personnel } from "@/lib/demo-data/personnel-list";
@@ -25,7 +25,10 @@ const assignmentSchema = z.object({
 });
 
 export async function POST(req: Request) {
-  const { tasks } = (await req.json()) as { tasks?: Task[] };
+  const { tasks, keys } = (await req.json()) as {
+    tasks?: Task[];
+    keys?: ProvidedKeys;
+  };
 
   if (!tasks || tasks.length === 0) {
     return NextResponse.json({ error: "tasks are required" }, { status: 400 });
@@ -34,7 +37,7 @@ export async function POST(req: Request) {
   // Deterministic baseline — always available.
   const baseline = assignPersonnel(tasks);
 
-  if (hasOpenAIKey()) {
+  if (hasOpenAI(keys)) {
     const roster = personnel.map((p) => ({
       id: p.id,
       name: p.name,
@@ -57,7 +60,7 @@ export async function POST(req: Request) {
     }));
 
     const ai = await generateStructured({
-      model: gpt(),
+      model: gpt(keys),
       schema: assignmentSchema,
       system: SYSTEM,
       prompt:

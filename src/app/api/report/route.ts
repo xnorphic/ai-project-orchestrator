@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { claudeDeep, hasAnthropicKey } from "@/lib/ai/models";
+import { claudeDeep, hasAnthropic, type ProvidedKeys } from "@/lib/ai/models";
 import { generateStructured } from "@/lib/ai/generate";
 import { reportSchema } from "@/lib/ai/schemas";
 import { buildReport } from "@/lib/logic/report";
@@ -20,13 +20,14 @@ Each risk has a severity (1-5) and likelihood (1-5). Be direct and specific
 with numbers. Recommendations should be actionable.`;
 
 export async function POST(req: Request) {
-  const { prd, tasks, option, assignments, scenarios } =
+  const { prd, tasks, option, assignments, scenarios, keys } =
     (await req.json()) as {
       prd?: PRD;
       tasks?: Task[];
       option?: TimelineOption;
       assignments?: Record<string, string>;
       scenarios?: Scenario[];
+      keys?: ProvidedKeys;
     };
 
   if (!prd || !tasks || !option) {
@@ -48,9 +49,9 @@ export async function POST(req: Request) {
     scenarios ?? [],
   );
 
-  if (hasAnthropicKey()) {
+  if (hasAnthropic(keys)) {
     const ai = await generateStructured({
-      model: claudeDeep(),
+      model: claudeDeep(keys),
       schema: reportSchema,
       system: SYSTEM,
       prompt:

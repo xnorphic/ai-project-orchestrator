@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { claudeDeep, hasAnthropicKey } from "@/lib/ai/models";
+import { claudeDeep, hasAnthropic, type ProvidedKeys } from "@/lib/ai/models";
 import { generateStructured } from "@/lib/ai/generate";
 import { tasksSchema } from "@/lib/ai/schemas";
 import { buildTasks } from "@/lib/logic/tasks";
@@ -32,9 +32,10 @@ function normalize(tasks: Task[]): Task[] {
 }
 
 export async function POST(req: Request) {
-  const { prd, option } = (await req.json()) as {
+  const { prd, option, keys } = (await req.json()) as {
     prd?: PRD;
     option?: TimelineOption;
+    keys?: ProvidedKeys;
   };
 
   if (!prd || !option) {
@@ -44,9 +45,9 @@ export async function POST(req: Request) {
     );
   }
 
-  if (hasAnthropicKey()) {
+  if (hasAnthropic(keys)) {
     const ai = await generateStructured({
-      model: claudeDeep(),
+      model: claudeDeep(keys),
       schema: tasksSchema,
       system: SYSTEM,
       prompt:

@@ -7,6 +7,8 @@ import { useHydrated } from "@/lib/use-hydrated";
 import { Button, Card, SectionTitle, Spinner } from "@/components/ui/primitives";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { PRDViewer } from "@/components/prd/PRDViewer";
+import { postAgent } from "@/lib/api";
+import type { TimelineOption } from "@/types";
 
 export default function PRDPage() {
   const router = useRouter();
@@ -42,12 +44,10 @@ export default function PRDPage() {
   async function generateTimeline() {
     setLoading(true);
     try {
-      const res = await fetch("/api/timeline", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prd, answers, questions }),
-      });
-      const data = await res.json();
+      const data = await postAgent<{ options: TimelineOption[] }>(
+        "/api/timeline",
+        { prd, answers, questions },
+      );
       setTimelineOptions(data.options);
       reach("timeline");
       router.push("/timeline");

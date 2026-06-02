@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { claudeFast, hasAnthropicKey } from "@/lib/ai/models";
+import { claudeFast, hasAnthropic, type ProvidedKeys } from "@/lib/ai/models";
 import { generateStructured } from "@/lib/ai/generate";
 import { timelineSchema } from "@/lib/ai/schemas";
 import { buildTimelineOptions } from "@/lib/logic/timeline";
@@ -16,19 +16,20 @@ Be concrete about what is added or skipped and why. recommended must be true
 only for the recommended option.`;
 
 export async function POST(req: Request) {
-  const { prd, answers } = (await req.json()) as {
+  const { prd, answers, keys } = (await req.json()) as {
     prd?: PRD;
     answers?: Record<string, string>;
     questions?: ClarifyingQuestion[];
+    keys?: ProvidedKeys;
   };
 
   if (!prd) {
     return NextResponse.json({ error: "prd is required" }, { status: 400 });
   }
 
-  if (hasAnthropicKey()) {
+  if (hasAnthropic(keys)) {
     const ai = await generateStructured({
-      model: claudeFast(),
+      model: claudeFast(keys),
       schema: timelineSchema,
       system: SYSTEM,
       prompt:

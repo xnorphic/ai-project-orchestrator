@@ -14,7 +14,9 @@ import {
   rankCandidates,
 } from "@/lib/logic/matching";
 import { personById } from "@/lib/demo-data/personnel-list";
+import { postAgent } from "@/lib/api";
 import { initials, usd } from "@/lib/brand";
+import type { Scenario } from "@/types";
 
 function Stat({
   value,
@@ -67,12 +69,10 @@ export default function GanttPage() {
     setAssigning(true);
     (async () => {
       try {
-        const res = await fetch("/api/personnel", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ tasks }),
-        });
-        const data = await res.json();
+        const data = await postAgent<{ assignments: Record<string, string> }>(
+          "/api/personnel",
+          { tasks },
+        );
         const map: Record<string, string> = data.assignments ?? {};
         Object.entries(map).forEach(([taskId, personId]) =>
           assignPerson(taskId, personId),
@@ -128,12 +128,12 @@ export default function GanttPage() {
   async function continueToScenarios() {
     setContinuing(true);
     try {
-      const res = await fetch("/api/scenarios", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prd, tasks, option, assignments }),
+      const data = await postAgent<{ scenarios: Scenario[] }>("/api/scenarios", {
+        prd,
+        tasks,
+        option,
+        assignments,
       });
-      const data = await res.json();
       setScenarios(data.scenarios);
       reach("scenarios");
       router.push("/scenarios");

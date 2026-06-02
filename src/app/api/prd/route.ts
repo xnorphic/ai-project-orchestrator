@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { claudeDeep, hasAnthropicKey } from "@/lib/ai/models";
+import { claudeDeep, hasAnthropic, type ProvidedKeys } from "@/lib/ai/models";
 import { generateStructured } from "@/lib/ai/generate";
 import { prdSchema } from "@/lib/ai/schemas";
 import { fallbackPRD } from "@/lib/logic/prd-fallback";
@@ -13,16 +13,19 @@ question must include 2-4 options and a single recommended answer, and target
 decisions that materially change timeline, staffing, or risk.`;
 
 export async function POST(req: Request) {
-  const { idea } = (await req.json()) as { idea?: string };
+  const { idea, keys } = (await req.json()) as {
+    idea?: string;
+    keys?: ProvidedKeys;
+  };
   const cleanIdea = (idea ?? "").trim();
 
   if (!cleanIdea) {
     return NextResponse.json({ error: "idea is required" }, { status: 400 });
   }
 
-  if (hasAnthropicKey()) {
+  if (hasAnthropic(keys)) {
     const ai = await generateStructured({
-      model: claudeDeep(),
+      model: claudeDeep(keys),
       schema: prdSchema,
       system: SYSTEM,
       prompt: `Product idea:\n"""${cleanIdea}"""\n\nProduce the PRD and 4-6 clarifying questions.`,

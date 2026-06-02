@@ -3,7 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Card, Spinner } from "@/components/ui/primitives";
+import { postAgent } from "@/lib/api";
 import { useProject } from "@/lib/store/project-store";
+import type { ClarifyingQuestion, PRD } from "@/types";
 import {
   demoIdea,
   demoPRD,
@@ -34,13 +36,10 @@ export default function Home() {
     reset();
     setIdeaStore(text.trim());
     try {
-      const res = await fetch("/api/prd", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idea: text.trim() }),
-      });
-      if (!res.ok) throw new Error("Failed to expand idea");
-      const data = await res.json();
+      const data = await postAgent<{ prd: PRD; questions: ClarifyingQuestion[] }>(
+        "/api/prd",
+        { idea: text.trim() },
+      );
       setPrdAndQuestions(data.prd, data.questions);
       reach("prd");
       router.push("/prd");

@@ -7,7 +7,8 @@ import { useHydrated } from "@/lib/use-hydrated";
 import { Button, SectionTitle, Spinner } from "@/components/ui/primitives";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ScenarioCard } from "@/components/scenarios/ScenarioCard";
-import type { ScenarioId } from "@/types";
+import { postAgent } from "@/lib/api";
+import type { FeasibilityReport, ScenarioId } from "@/types";
 
 const DISPLAY_ORDER: ScenarioId[] = ["optimistic", "base", "pessimistic"];
 
@@ -65,12 +66,13 @@ export default function ScenariosPage() {
   async function continueToReport() {
     setLoading(true);
     try {
-      const res = await fetch("/api/report", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prd, tasks, option, assignments, scenarios }),
+      const data = await postAgent<{ report: FeasibilityReport }>("/api/report", {
+        prd,
+        tasks,
+        option,
+        assignments,
+        scenarios,
       });
-      const data = await res.json();
       setReport(data.report);
       reach("report");
       router.push("/report");

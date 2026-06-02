@@ -13,7 +13,8 @@ import {
 } from "@/components/ui/primitives";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { TimelineCard } from "@/components/timeline/TimelineCard";
-import type { TimelineOptionId } from "@/types";
+import { postAgent } from "@/lib/api";
+import type { Task, TimelineOptionId } from "@/types";
 
 export default function TimelinePage() {
   const router = useRouter();
@@ -63,12 +64,10 @@ export default function TimelinePage() {
     setLoading(true);
     try {
       const option = { ...selected, sprintLengthWeeks: sprintLength };
-      const res = await fetch("/api/tasks", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prd, option }),
+      const data = await postAgent<{ tasks: Task[] }>("/api/tasks", {
+        prd,
+        option,
       });
-      const data = await res.json();
       setTasks(data.tasks);
       reach("gantt");
       router.push("/gantt");

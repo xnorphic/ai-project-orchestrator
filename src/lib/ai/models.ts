@@ -1,18 +1,17 @@
-import { anthropic } from "@ai-sdk/anthropic";
-import { openai } from "@ai-sdk/openai";
+import { createAnthropic } from "@ai-sdk/anthropic";
+import { createOpenAI } from "@ai-sdk/openai";
 import type { LanguageModel } from "ai";
 
 /**
- * Model selection — cost-aware by default.
+ * Model selection — cost-aware, with bring-your-own-key support.
  *
- * Claude:  prefer Haiku for lighter steps, escalate to Sonnet for the
- *          detail-heavy reasoning steps (PRD, task decomposition, scenarios,
- *          feasibility report).
- * OpenAI:  prefer a mini model for the fast, structured personnel matching.
+ * Keys are resolved per request: a key passed from the client (entered in the
+ * in-app settings) takes priority, otherwise the server env var is used. If
+ * neither exists, callers fall back to the deterministic engines in lib/logic.
  *
- * All overridable via env so the demo runs against whatever a given key can
- * access. If a key is missing or a call fails, callers fall back to the
- * deterministic local engines in lib/logic.
+ * Claude:  Haiku for lighter steps, Sonnet for detail-heavy reasoning
+ *          (PRD, task decomposition, scenarios, feasibility report).
+ * OpenAI:  a mini model for the fast, structured personnel matching.
  */
 
 export const CLAUDE_DEEP_MODEL =
@@ -21,25 +20,38 @@ export const CLAUDE_FAST_MODEL =
   process.env.APO_CLAUDE_FAST_MODEL ?? "claude-haiku-4-5";
 export const OPENAI_MODEL = process.env.APO_OPENAI_MODEL ?? "gpt-4o-mini";
 
-export function hasAnthropicKey(): boolean {
-  return Boolean(process.env.ANTHROPIC_API_KEY);
+export interface ProvidedKeys {
+  anthropic?: string;
+  openai?: string;
 }
 
-export function hasOpenAIKey(): boolean {
-  return Boolean(process.env.OPENAI_API_KEY);
+function anthropicKey(keys?: ProvidedKeys): string {
+  return (keys?.anthropic?.trim() || process.env.ANTHROPIC_API_KEY || "").trim();
+}
+
+function openaiKey(keys?: ProvidedKeys): string {
+  return (keys?.openai?.trim() || process.env.OPENAI_API_KEY || "").trim();
+}
+
+export function hasAnthropic(keys?: ProvidedKeys): boolean {
+  return Boolean(anthropicKey(keys));
+}
+
+export function hasOpenAI(keys?: ProvidedKeys): boolean {
+  return Boolean(openaiKey(keys));
 }
 
 /** Sonnet — for detail-heavy reasoning. */
-export function claudeDeep(): LanguageModel {
-  return anthropic(CLAUDE_DEEP_MODEL);
+export function claudeDeep(keys?: ProvidedKeys): LanguageModel {
+  return createAnthropic({ apiKey: anthropicKey(keys) })(CLAUDE_DEEP_MODEL);
 }
 
 /** Haiku — for lighter, faster steps. */
-export function claudeFast(): LanguageModel {
-  return anthropic(CLAUDE_FAST_MODEL);
+export function claudeFast(keys?: ProvidedKeys): LanguageModel {
+  return createAnthropic({ apiKey: anthropicKey(keys) })(CLAUDE_FAST_MODEL);
 }
 
 /** Mini OpenAI model — fast structured matching. */
-export function gpt(): LanguageModel {
-  return openai(OPENAI_MODEL);
+export function gpt(keys?: ProvidedKeys): LanguageModel {
+  return createOpenAI({ apiKey: openaiKey(keys) })(OPENAI_MODEL);
 }

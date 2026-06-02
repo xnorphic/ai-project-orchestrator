@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { STEP_ORDER, useProject } from "@/lib/store/project-store";
 import type { Step } from "@/types";
 import { clsx } from "@/lib/clsx";
+import { KeySettings } from "@/components/layout/KeySettings";
 
 const STEP_META: { step: Step; label: string; href: string }[] = [
   { step: "idea", label: "Idea", href: "/" },
@@ -77,8 +78,8 @@ export function Navbar() {
           })}
         </nav>
 
-        <div className="ml-auto hidden sm:block text-xs font-semibold text-muted">
-          Careem · Delivery Intelligence
+        <div className="ml-auto">
+          <KeySettings />
         </div>
       </div>
     </header>
