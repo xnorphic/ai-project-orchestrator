@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { claude, hasAnthropicKey } from "@/lib/ai/models";
+import { claudeDeep, hasAnthropicKey } from "@/lib/ai/models";
 import { generateStructured } from "@/lib/ai/generate";
 import { prdSchema } from "@/lib/ai/schemas";
 import { fallbackPRD } from "@/lib/logic/prd-fallback";
@@ -22,7 +22,7 @@ export async function POST(req: Request) {
 
   if (hasAnthropicKey()) {
     const ai = await generateStructured({
-      model: claude(),
+      model: claudeDeep(),
       schema: prdSchema,
       system: SYSTEM,
       prompt: `Product idea:\n"""${cleanIdea}"""\n\nProduce the PRD and 4-6 clarifying questions.`,

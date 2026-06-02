@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { claude, hasAnthropicKey } from "@/lib/ai/models";
+import { claudeFast, hasAnthropicKey } from "@/lib/ai/models";
 import { generateStructured } from "@/lib/ai/generate";
 import { timelineSchema } from "@/lib/ai/schemas";
 import { buildTimelineOptions } from "@/lib/logic/timeline";
@@ -28,7 +28,7 @@ export async function POST(req: Request) {
 
   if (hasAnthropicKey()) {
     const ai = await generateStructured({
-      model: claude(),
+      model: claudeFast(),
       schema: timelineSchema,
       system: SYSTEM,
       prompt:

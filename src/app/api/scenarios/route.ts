@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { claude, hasAnthropicKey } from "@/lib/ai/models";
+import { claudeDeep, hasAnthropicKey } from "@/lib/ai/models";
 import { generateStructured } from "@/lib/ai/generate";
 import { scenariosSchema } from "@/lib/ai/schemas";
 import { buildScenarios, computeBaseline } from "@/lib/logic/scenarios";
@@ -34,7 +34,7 @@ export async function POST(req: Request) {
 
   if (hasAnthropicKey()) {
     const ai = await generateStructured({
-      model: claude(),
+      model: claudeDeep(),
       schema: scenariosSchema,
       system: SYSTEM,
       prompt:
