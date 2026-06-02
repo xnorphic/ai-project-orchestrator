@@ -1,5 +1,7 @@
 # AI Project Orchestrator
 
+**Live demo: https://ai-project-orchestrator-six.vercel.app**
+
 An AI that turns a one-line idea into a **staffed, scenario-modelled delivery plan**.
 It expands the idea into a PRD, asks clarifying questions, plans a timeline,
 decomposes the work into tasks driven by AI sub-agents, assigns human owners
@@ -34,15 +36,26 @@ tech backlog).
 ## Works with or without API keys
 
 Every agent has a deterministic local engine behind it. With **no keys**, the
-whole flow runs offline using these engines. Add keys to switch the generative
-steps (PRD, timeline, tasks, personnel, scenarios, report) to live AI.
+whole flow runs using these engines. Add keys to switch the generative steps
+(PRD, timeline, tasks, personnel, scenarios, report) to live AI.
 
-```bash
-cp .env.example .env.local   # then add keys if you have them
-```
+There are two ways to provide keys:
 
-- `ANTHROPIC_API_KEY` — enables Claude for reasoning steps
-- `OPENAI_API_KEY` — enables GPT for personnel matching
+1. **In the app (recommended for the live demo)** — click **Add API keys** in
+   the top bar and paste your Anthropic and/or OpenAI keys. They are stored only
+   in your browser (localStorage) and sent only to this app's own routes, which
+   forward them to the provider you chose. This is why the hosted demo needs no
+   server secrets.
+2. **Server env (local dev)** —
+
+   ```bash
+   cp .env.example .env.local   # then add keys if you have them
+   ```
+
+   - `ANTHROPIC_API_KEY` — enables Claude for reasoning steps
+   - `OPENAI_API_KEY` — enables GPT for personnel matching
+
+A key entered in the app takes priority over the server env var.
 
 ---
 
